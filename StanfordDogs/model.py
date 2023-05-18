@@ -41,7 +41,7 @@ class StanfordModel(nn.Module):
         x = self.head(x)
         return x
     
-    def train(self, epoch, dataloader, optimizer=None, criterion=None, version=0):
+    def train(self, epoch, dataloader, path_name, optimizer=None, criterion=None):
         if optimizer == None:
             optimizer = torch.optim.Adam(self.head.parameters())
         if criterion == None:
@@ -70,9 +70,9 @@ class StanfordModel(nn.Module):
                 
                 print(f'[{ep + 1}, {i + 1:5d}] loss: {loss.item():.3f}')
 
-            print(f'[{ep + 1}] loss: {running_loss:.3f}')
+            print(f'[{ep + 1}] loss sum : {running_loss:.3f}')
 
-        torch.save(self.head.state_dict(), './weights/model_'+str(version)+'.pt')
+        torch.save(self.head.state_dict(), path_name)
 
     def test(self, dataset, criterion=None):
         if criterion == None:
