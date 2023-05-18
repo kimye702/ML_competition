@@ -74,7 +74,7 @@ class StanfordModel(nn.Module):
 
         torch.save(self.head.state_dict(), './weights/model_'+str(version)+'.pt')
 
-    def test(self, epoch, dataset, criterion=None):
+    def test(self, dataset, criterion=None):
         if criterion == None:
             criterion = torch.nn.CrossEntropyLoss()
 
@@ -83,24 +83,23 @@ class StanfordModel(nn.Module):
         total_cnt = len(dataset)
 
         with torch.no_grad():
-            for ep in range(epoch):   # 데이터셋을 수차례 반복합니다.
-                for i, data in enumerate(dataset):
-                    # [inputs, labels]의 목록인 data로부터 입력을 받은 후;
-                    image, label = data
-                    image = image.to(self.device)  # [100, 3, 224, 224]
-                    label = label.to(self.device)  # [100]
+            for i, data in enumerate(dataset):
+                # [inputs, labels]의 목록인 data로부터 입력을 받은 후;
+                image, label = data
+                image = image.to(self.device)  # [100, 3, 224, 224]
+                label = label.to(self.device)  # [100]
 
-                    # 순전파 + 역전파 + 최적화를 한 후
-                    output = self.__forward(image[None, ...])
-                    output = output.squeeze()
-                    label = label.squeeze()
-                    loss = criterion(output, label)
-                    loss_sum += loss
+                # 순전파 + 역전파 + 최적화를 한 후
+                output = self.__forward(image[None, ...])
+                output = output.squeeze()
+                label = label.squeeze()
+                loss = criterion(output, label)
+                loss_sum += loss
 
-                    pred = torch.argmax(output)
-                    correct_top1 += label[pred]
-                    
-                    print(f'[{ep + 1}, {i + 1:5d}] loss: {loss.item():.3f}')
+                pred = torch.argmax(output)
+                correct_top1 += label[pred]
+                
+                print(f'[{i + 1:5d}] loss: {loss.item():.3f}')
 
         print(f'accuracy : {correct_top1/total_cnt}, average loss : {loss_sum/total_cnt}')
 
