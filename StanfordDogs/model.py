@@ -1,7 +1,6 @@
 import timm
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 class StanfordModel(nn.Module):
     def __init__(self, device='cpu'):
@@ -42,7 +41,11 @@ class StanfordModel(nn.Module):
         x = self.head(x)
         return x
     
-    def train(self, epoch, dataloader, optimizer, criterion, version=0):
+    def train(self, epoch, dataloader, optimizer=None, criterion=None, version=0):
+        if optimizer == None:
+            optimizer = torch.optim.Adam(self.head.parameters())
+        if criterion == None:
+            criterion = torch.nn.CrossEntropyLoss()
         
         for ep in range(epoch):   # 데이터셋을 수차례 반복합니다.
 
@@ -69,12 +72,15 @@ class StanfordModel(nn.Module):
 
             print(f'[{ep + 1}] loss: {running_loss:.3f}')
 
-        torch.save(self.head.state_dict(), './model_'+str(version)+'.pt')
+        torch.save(self.head.state_dict(), './weights/model_'+str(version)+'.pt')
 
-    def test(self, epoch, dataset, criterion):
+    def test(self, epoch, dataset, criterion=None):
+        if criterion == None:
+            criterion = torch.nn.CrossEntropyLoss()
 
         correct_top1 = 0
-        total = len(dataset)
+        loss_sum = 0
+        total_cnt = len(dataset)
 
         with torch.no_grad():
             for ep in range(epoch):   # 데이터셋을 수차례 반복합니다.
@@ -89,13 +95,14 @@ class StanfordModel(nn.Module):
                     output = output.squeeze()
                     label = label.squeeze()
                     loss = criterion(output, label)
+                    loss_sum += loss
 
                     pred = torch.argmax(output)
                     correct_top1 += label[pred]
                     
                     print(f'[{ep + 1}, {i + 1:5d}] loss: {loss.item():.3f}')
 
-        print(f'accuracy : {correct_top1/total}')
+        print(f'accuracy : {correct_top1/total_cnt}, average loss : {loss_sum/total_cnt}')
 
     def load_weight(self, path):
         self.head.load_state_dict(torch.load(path))
