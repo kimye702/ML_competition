@@ -12,6 +12,8 @@ class StanfordModel(nn.Module):
         self.backbone = timm.models.vit_base_patch16_224(pretrained=True).to(device)
         for param in self.backbone.parameters():
             param.requires_grad = False
+        for param in self.backbone.head.parameters():
+            param.requires_grad = True
 
         self.head = nn.Sequential(
             nn.Linear(
@@ -43,7 +45,7 @@ class StanfordModel(nn.Module):
     
     def train(self, epoch, dataloader, path_name, optimizer=None, criterion=None):
         if optimizer == None:
-            optimizer = torch.optim.Adam(self.params)
+            optimizer = torch.optim.Adam(self.parameters())
         if criterion == None:
             criterion = torch.nn.CrossEntropyLoss()
         
