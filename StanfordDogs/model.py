@@ -38,14 +38,16 @@ class StanfordModel(nn.Module):
             nn.Softmax()
         ).to(device)
 
-    def __forward(self, x):
+        self.params = list(self.backbone.head.parameters()) + list(self.head.parameters())
+
+    def forward(self, x):
         x = self.backbone(x)
         x = self.head(x)
         return x
     
     def train(self, epoch, dataloader, path_name, optimizer=None, criterion=None):
         if optimizer == None:
-            optimizer = torch.optim.Adam(self.parameters())
+            optimizer = torch.optim.Adam(self.params, lr=0.00001)
         if criterion == None:
             criterion = torch.nn.CrossEntropyLoss()
         
@@ -62,7 +64,7 @@ class StanfordModel(nn.Module):
                 optimizer.zero_grad()
 
                 # 순전파 + 역전파 + 최적화를 한 후
-                outputs = self.__forward(images)
+                outputs = self.forward(images)
                 loss = criterion(outputs.squeeze(), labels.squeeze())
                 loss.backward()
                 optimizer.step()
@@ -92,7 +94,7 @@ class StanfordModel(nn.Module):
                 label = label.to(self.device)  # [100]
 
                 # 순전파 + 역전파 + 최적화를 한 후
-                output = self.__forward(image[None, ...])
+                output = self.forward(image[None, ...])
                 output = output.squeeze()
                 label = label.squeeze()
                 loss = criterion(output, label)
