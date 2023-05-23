@@ -9,10 +9,10 @@ class StanfordModel(nn.Module):
         self.__num_classes = 120
         self.device = device
 
-        self.__backbone = timm.models.vit_base_patch16_224(pretrained=True).to(device)
-        for param in self.__backbone.parameters():
+        self.backbone = timm.models.vit_base_patch16_224(pretrained=True).to(device)
+        for param in self.backbone.parameters():
             param.requires_grad = False
-        
+
         self.head = nn.Sequential(
             nn.Linear(
             in_features = 1000,
@@ -37,13 +37,13 @@ class StanfordModel(nn.Module):
         ).to(device)
 
     def __forward(self, x):
-        x = self.__backbone(x)
+        x = self.backbone(x)
         x = self.head(x)
         return x
     
     def train(self, epoch, dataloader, path_name, optimizer=None, criterion=None):
         if optimizer == None:
-            optimizer = torch.optim.Adam(self.head.parameters())
+            optimizer = torch.optim.Adam(self.params)
         if criterion == None:
             criterion = torch.nn.CrossEntropyLoss()
         
