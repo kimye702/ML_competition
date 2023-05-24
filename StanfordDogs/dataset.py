@@ -5,30 +5,34 @@ import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 import torch.nn.functional as F
 
+def toTensor(x):
+  return torch.tensor([x])
+def toOne_hot(x):
+  return torch.FloatTensor(np.array(F.one_hot(x, 120)))
+
 class StanfordDataset(Dataset): 
   def __init__(self, src):
-
-    self.__num_classes = 120
 
     self.normalize = transforms.Normalize(
       mean=[0.5, 0.5, 0.5],
       std=[0.5, 0.5, 0.5]
       )
-
+    
     self.transform = transforms.Compose(
       [transforms.Resize(256),
        transforms.CenterCrop(224),
        transforms.ToTensor(),
        self.normalize,
        ])
+    self.target_transfrom = transforms.Compose([
+        transforms.Lambda(toTensor),
+        transforms.Lambda(toOne_hot),
+        ])
 
     self.dataset = ImageFolder(
       src,
       transform=self.transform,
-      target_transform=transforms.Compose([
-        lambda x:torch.tensor([x]),
-        lambda x:torch.FloatTensor(np.array(F.one_hot(x, self.__num_classes)))
-        ])
+      target_transform=self.target_transfrom
       )
 
   # 총 데이터의 개수를 리턴
