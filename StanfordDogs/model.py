@@ -37,7 +37,6 @@ class StanfordModel(nn.Module):
 
             nn.Softmax()
         ).to(device)
-        
 
         self.params = list(self.backbone.head.parameters()) + list(self.head.parameters())
 
