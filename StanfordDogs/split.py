@@ -8,5 +8,5 @@ def path(*names):
     return path[:-1]
 
 def copyTo(image, label, dst):
-  os.makedirs(path(dst, label), exist_ok=True)
-  shutil.copy2(image, path(dst, label))
+    os.makedirs(path(dst, label), exist_ok=True)
+    shutil.copy2(image, path(dst, label))
