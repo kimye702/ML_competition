@@ -20,7 +20,7 @@ class StanfordDataset(Dataset):
         
         self.transform = transform
         
-        self.target_transfrom = transforms.Compose([
+        self.target_transform = transforms.Compose([
             transforms.Lambda(toTensor),
             transforms.Lambda(toOne_hot),
         ])
@@ -28,7 +28,7 @@ class StanfordDataset(Dataset):
         self.dataset = ImageFolder(
             src,
             transform=self.transform,
-            target_transform=self.target_transfrom
+            target_transform=self.target_transform
         )
 
     def __len__(self):
