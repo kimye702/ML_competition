@@ -17,15 +17,9 @@ class StanfordDataset(Dataset):
             mean=[0.5, 0.5, 0.5],
             std=[0.5, 0.5, 0.5]
         )
-
-        if transform is None:
-            transform = transforms.Compose([
-                transforms.Resize(int(resol / 0.875)),
-                transforms.CenterCrop(resol),
-                transforms.ToTensor(),
-                self.normalize
-            ])
-
+        
+        self.transform = transform
+        
         self.target_transfrom = transforms.Compose([
             transforms.Lambda(toTensor),
             transforms.Lambda(toOne_hot),
@@ -33,14 +27,12 @@ class StanfordDataset(Dataset):
 
         self.dataset = ImageFolder(
             src,
-            transform=transform,
+            transform=self.transform,
             target_transform=self.target_transfrom
         )
 
-    # 총 데이터의 개수를 리턴
     def __len__(self):
         return len(self.dataset)
 
-    # 인덱스를 입력받아 그에 맵핑되는 입출력 데이터를 파이토치의 Tensor 형태로 리턴
     def __getitem__(self, idx):
         return self.dataset[idx]
