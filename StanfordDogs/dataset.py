@@ -1,3 +1,4 @@
+//dataset.py
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -19,8 +20,13 @@ class StanfordDataset(Dataset):
         
         self.transform = transforms.Compose([
             transforms.Resize(int(resol/0.875)),
-            transforms.RandomCrop(resol),             # 무작위로 이미지를 자르는 데이터 증대 기법
-            transforms.RandomHorizontalFlip(),        # 무작위로 이미지를 좌우 반전하는 데이터 증대 기법
+            transforms.RandomCrop(resol),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(20),                  # 이미지를 무작위로 회전하는 데이터 증대 기법
+            transforms.RandomAffine(0, shear=0.05, scale=(0.8, 1.2)),   # 이미지를 무작위로 이동, 변형하는 데이터 증대 기법
+            transforms.ColorJitter(brightness=0.5, contrast=0.5),       # 이미지의 밝기와 대비를 무작위로 조정하는 데이터 증대 기법
+            transforms.RandomPerspective(distortion_scale=0.2),         # 이미지의 원근 변환을 무작위로 적용하는 데이터 증대 기법
+            transforms.RandomResizedCrop(resol, scale=(0.8, 1.2), ratio=(0.75, 1.33)),  # 이미지를 무작위로 자르고 크기를 조정하는 데이터 증대 기법
             transforms.ToTensor(),
             self.normalize
         ])
