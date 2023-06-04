@@ -6,39 +6,41 @@ from torchvision.datasets import ImageFolder
 import torch.nn.functional as F
 
 def toTensor(x):
-  return torch.tensor([x])
+    return torch.tensor([x])
+
 def toOne_hot(x):
-  return torch.FloatTensor(np.array(F.one_hot(x, 120)))
+    return torch.FloatTensor(np.array(F.one_hot(x, 120)))
 
-class StanfordDataset(Dataset): 
-  def __init__(self, src):
+class StanfordDataset(Dataset):
+    def __init__(self, src, resol, transform=None):
+        self.normalize = transforms.Normalize(
+            mean=[0.5, 0.5, 0.5],
+            std=[0.5, 0.5, 0.5]
+        )
 
-    self.normalize = transforms.Normalize(
-      mean=[0.5, 0.5, 0.5],
-      std=[0.5, 0.5, 0.5]
-      )
-    
-    self.transform = transforms.Compose(
-      [transforms.Resize(256),
-       transforms.CenterCrop(224),
-       transforms.ToTensor(),
-       self.normalize,
-       ])
-    self.target_transfrom = transforms.Compose([
-        transforms.Lambda(toTensor),
-        transforms.Lambda(toOne_hot),
+        if transform is None:
+            transform = transforms.Compose([
+                transforms.Resize(int(resol / 0.875)),
+                transforms.CenterCrop(resol),
+                transforms.ToTensor(),
+                self.normalize
+            ])
+
+        self.target_transfrom = transforms.Compose([
+            transforms.Lambda(toTensor),
+            transforms.Lambda(toOne_hot),
         ])
 
-    self.dataset = ImageFolder(
-      src,
-      transform=self.transform,
-      target_transform=self.target_transfrom
-      )
+        self.dataset = ImageFolder(
+            src,
+            transform=transform,
+            target_transform=self.target_transfrom
+        )
 
-  # 총 데이터의 개수를 리턴
-  def __len__(self): 
-    return len(self.dataset)
+    # 총 데이터의 개수를 리턴
+    def __len__(self):
+        return len(self.dataset)
 
-  # 인덱스를 입력받아 그에 맵핑되는 입출력 데이터를 파이토치의 Tensor 형태로 리턴
-  def __getitem__(self, idx): 
-    return self.dataset[idx]
+    # 인덱스를 입력받아 그에 맵핑되는 입출력 데이터를 파이토치의 Tensor 형태로 리턴
+    def __getitem__(self, idx):
+        return self.dataset[idx]
