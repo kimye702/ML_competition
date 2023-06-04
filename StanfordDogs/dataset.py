@@ -35,4 +35,4 @@ class StanfordDataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        return self.dataset[idx]
+        return self.dataset[idx][0], self.dataset[idx][1]
