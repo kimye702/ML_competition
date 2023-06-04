@@ -1,12 +1,10 @@
 class StanfordDataset(Dataset):
-    def __init__(self, src, resol, transform=None):
+    def __init__(self, src, resol):
         self.normalize = transforms.Normalize(
             mean=[0.5, 0.5, 0.5],
             std=[0.5, 0.5, 0.5]
         )
-        
-        self.transform = transform
-        
+
         self.target_transform = transforms.Compose([
             transforms.Lambda(toTensor),
             transforms.Lambda(toOne_hot),
@@ -14,7 +12,13 @@ class StanfordDataset(Dataset):
 
         self.dataset = ImageFolder(
             src,
-            transform=self.transform,
+            transform=transforms.Compose([
+                transforms.RandomResizedCrop(resol),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomRotation(10),
+                transforms.ToTensor(),
+                self.normalize
+            ]),
             target_transform=self.target_transform
         )
 
@@ -24,8 +28,5 @@ class StanfordDataset(Dataset):
     def __getitem__(self, idx):
         image = self.dataset[idx][0]
         label = self.dataset[idx][1]
-        
-        if self.transform is not None:
-            image = self.transform(image)
-        
+
         return image, label
