@@ -1,17 +1,5 @@
-import torch
-import numpy as np
-from torch.utils.data import Dataset
-import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder
-import torch.nn.functional as F
-
-def toTensor(x):
-    return torch.tensor([x])
-def toOne_hot(x):
-    return torch.FloatTensor(np.array(F.one_hot(x, 120)))
-
 class StanfordDataset(Dataset): 
-    def __init__(self, src, resol):
+    def __init__(self, src, resol, transformed_src):
         self.normalize = transforms.Normalize(
             mean=[0.5, 0.5, 0.5],
             std=[0.5, 0.5, 0.5]
@@ -40,14 +28,18 @@ class StanfordDataset(Dataset):
             target_transform=self.target_transform
         )
 
+        self.transformed_dataset = ImageFolder(
+            transformed_src,
+            transform=self.transform,
+            target_transform=self.target_transform
+        )
+
     def __len__(self): 
-        return len(self.dataset) * 2  # 데이터셋 길이를 기존 데이터와 변형 데이터의 합으로 변경
+        return len(self.dataset) + len(self.transformed_dataset)
 
     def __getitem__(self, idx): 
         if idx < len(self.dataset):
-            # 기존 데이터를 반환
             return self.dataset[idx]
         else:
-            # 변형된 데이터를 반환
             transformed_idx = idx - len(self.dataset)
             return self.transformed_dataset[transformed_idx]
