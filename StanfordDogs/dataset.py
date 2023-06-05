@@ -6,6 +6,11 @@ from torchvision.datasets import ImageFolder
 import torch.nn.functional as F
 from torch.utils.data import ConcatDataset
 
+def toTensor(x):
+    return torch.tensor([x])
+def toOne_hot(x):
+    return torch.FloatTensor(np.array(F.one_hot(x, 120)))
+
 class StanfordDataset(Dataset): 
     def __init__(self, src, resol):
         self.normalize = transforms.Normalize(
@@ -49,3 +54,4 @@ class StanfordDataset(Dataset):
 
     def __getitem__(self, idx): 
         return self.augmentation[idx]
+
