@@ -29,17 +29,28 @@ class StanfordDataset(Dataset):
             transforms.ToTensor(),
             self.normalize
         ])
+
+        # 타겟 데이터 변환을 위한 함수 설정
         self.target_transform = transforms.Compose([
             transforms.Lambda(toTensor),
             transforms.Lambda(toOne_hot),
         ])
 
+        # 기존 데이터셋 로드
         self.dataset = ImageFolder(
             src,
+            # transform=self.transform,
+            # target_transform=self.target_transform
+        )
+
+        # 변형된 데이터셋 로드
+        self.transformed_dataset = ImageFolder(
+            transformed_src,
             transform=self.transform,
             target_transform=self.target_transform
         )
-        self.dataset+=target_transform
+
+        self.dataset+=self.transformed_dataset
 
     def __len__(self): 
         return len(self.dataset)
