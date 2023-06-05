@@ -18,7 +18,14 @@ class StanfordDataset(Dataset):
             std=[0.5, 0.5, 0.5]
         )
         
-        self.transform = transforms.Compose([
+        self.transform = transforms.Compose(
+            [transforms.Resize(int(resol/0.875)),
+            transforms.CenterCrop(resol),
+            transforms.ToTensor(),
+            self.normalize
+            ])
+
+        self.transform2 = transforms.Compose([
             transforms.Resize(int(resol/0.875)),
             transforms.RandomCrop(resol),
             transforms.RandomHorizontalFlip(),
@@ -36,12 +43,14 @@ class StanfordDataset(Dataset):
         ])
 
         self.original_dataset = ImageFolder(
-            src
+            src,
+            transform=self.transform,
+            target_transform=self.target_transfrom
         )
 
         self.transformed_dataset = ImageFolder(
             src,
-            transform=self.transform,
+            transform=self.transform2,
             target_transform=self.target_transform
         )
 
