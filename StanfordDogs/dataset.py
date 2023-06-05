@@ -38,7 +38,7 @@ class StanfordDataset(Dataset):
             src,
             transform=self.transform,
             target_transform=self.target_transform,
-            self.dataset+=target_transform
+            self.dataset = self.dataset + target_transform
         )
 
     def __len__(self): 
