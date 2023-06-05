@@ -43,7 +43,7 @@ class StanfordDataset(Dataset):
         self.augmentation = (self.dataset + self.target_transform)
 
     def __len__(self): 
-        return len(self.dataset)
+        return len(self.augmentation)
 
     def __getitem__(self, idx): 
-        return self.dataset[idx]
+        return self.augmentation[idx]
