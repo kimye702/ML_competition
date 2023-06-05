@@ -45,7 +45,7 @@ class StanfordDataset(Dataset):
         self.original_dataset = ImageFolder(
             src,
             transform=self.transform,
-            target_transform=self.target_transfrom
+            target_transform=self.target_transform
         )
 
         self.transformed_dataset = ImageFolder(
