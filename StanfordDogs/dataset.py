@@ -37,8 +37,8 @@ class StanfordDataset(Dataset):
         self.dataset = ImageFolder(
             src,
             transform=self.transform,
-            target_transform=self.target_transform,
-            self.dataset = self.dataset + target_transform
+            target_transform=self.target_transform
+            return (src+target_transform)
         )
 
     def __len__(self): 
